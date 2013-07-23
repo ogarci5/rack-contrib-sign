@@ -54,7 +54,7 @@ module Rack
           extract_headers(env).each { |h,v| receipt.headers[h] = v }
 
           receipt.api_key = credentials[:key]
-          receipt.api_secret = get_secret credentials[:key]
+          receipt.api_secret = get_secret(credentials[:key])
 
           receipt
         end
