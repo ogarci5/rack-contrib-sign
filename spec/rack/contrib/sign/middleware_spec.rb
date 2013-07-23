@@ -28,16 +28,19 @@ describe Rack::Contrib::Sign::Middleware do
       env = {
         'REQUEST_METHOD' => 'POST',
         'REQUEST_URI' => 'foo/bar',
-        'HTTP_AUTHORIZATION' => 'foo-bar 123:mysignature',
         'HTTP_HI_FOOO' => 'YIPEE',
         'rack.input' => StringIO.new('foo=bar')
       }
 
-      receipt = ware.build_receipt env
+      creds = { key: '123', signature: 'foo' }
+
+      receipt = ware.build_receipt(env, creds)
 
       receipt.uri.should eq('foo/bar')
       receipt.request_method.should eq('POST')
       receipt.body.should eq('foo=bar')
+      receipt.api_key.should eq('123')
+      receipt.api_secret.should eq('abc')
       receipt.headers.should eq({
         'HI-FOOO' => 'YIPEE',
       })

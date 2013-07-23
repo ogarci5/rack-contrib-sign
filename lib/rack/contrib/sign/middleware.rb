@@ -18,9 +18,7 @@ module Rack
             return [401, {}, []]
           end
 
-          receipt = build_receipt env
-          receipt.api_key = creds[:key]
-          receipt.api_secret = get_secret creds[:key]
+          receipt = build_receipt env, creds
 
           sign = receipt.to_s
 
@@ -42,13 +40,16 @@ module Rack
         end
 
         # Extract environmental data into a Receipt
-        def build_receipt env
+        def build_receipt env, credentials
           receipt = Rack::Contrib::Sign::Receipt.new
           receipt.uri = env['REQUEST_URI']
           receipt.request_method = env['REQUEST_METHOD']
           receipt.body = extract_body env
 
           extract_headers(env).each { |h,v| receipt.headers[h] = v }
+
+          receipt.api_key = credentials[:key]
+          receipt.api_secret = get_secret credentials[:key]
 
           receipt
         end
