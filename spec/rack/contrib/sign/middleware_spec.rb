@@ -16,7 +16,12 @@ describe Rack::Contrib::Sign::Middleware do
 
     logger
   end
-  let (:ware) { Rack::Contrib::Sign::Middleware.new(app, logger, "foo-bar", "HI-") }
+  let (:ware) { Rack::Contrib::Sign::Middleware.new(
+    app,
+    logger: logger,
+    realm: "foo-bar",
+    prefix: "HI-"
+  )}
 
   describe "#call" do
     context "I have no other tests" do

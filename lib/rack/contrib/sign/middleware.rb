@@ -1,14 +1,14 @@
 
-
 module Rack
   module Contrib
     module Sign
       class Middleware
-        def initialize app, logger, realm, prefix
+        def initialize app, opts
+
           @app = app
-          @logger = logger
-          @realm = realm
-          @header_prefix = prefix.gsub(/-/, '_').downcase
+          @logger = opts[:logger]
+          @realm = opts[:realm]
+          @header_prefix = (opts[:prefix] || "").gsub(/-/, '_').downcase
         end
 
         def call env
