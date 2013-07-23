@@ -1,4 +1,5 @@
 require 'simplecov'
+require 'stringio'
 
 SimpleCov.start do
   add_group "Rack Code", "/lib"

@@ -1,3 +1,6 @@
+
+require 'logger'
+
 require "rack/contrib/sign/version"
 
 module Rack
@@ -13,7 +16,7 @@ module Rack
       def call env
 
         unless env['HTTP_AUTHORIZATION']
-          @logger.error "Denied: Authorization header not present."
+          @logger.info "Denied: Authorization header not present."
           return [401, {}, []]
         end
 
