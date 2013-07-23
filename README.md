@@ -20,7 +20,7 @@ Or install it yourself as:
 Install in Rack by adding the following to your config.ru:
 
 ```ruby
-require 'rack/contrib/sign
+require 'rack/contrib/sign'
 use Rack::Contrib::Sign::Middleware
 ```
 
