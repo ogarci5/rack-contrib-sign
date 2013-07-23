@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Rack::Contrib::Sign do
+describe Rack::Contrib::Sign::Middleware do
   let (:app) do
     app = double()
     app.stub(:call => 'Hello, world!')
@@ -16,7 +16,7 @@ describe Rack::Contrib::Sign do
 
     logger
   end
-  let (:ware) { Rack::Contrib::Sign.new(app, logger, "foo-bar", "HI-") }
+  let (:ware) { Rack::Contrib::Sign::Middleware.new(app, logger, "foo-bar", "HI-") }
 
   describe "#call" do
     context "I have no other tests" do
