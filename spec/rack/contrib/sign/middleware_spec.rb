@@ -29,6 +29,18 @@ describe Rack::Contrib::Sign::Middleware do
         log_string.string.should eq("INFO - Denied: Authorization header not present.\n")
       end
 
+      it "401s when I don't sign it right" do
+        env = {
+          'HTTP_AUTHORIZATION' => 'foo-bar YABBA DABBA DOOO',
+          'REQUEST_METHOD' => 'POST',
+          'REQUEST_URI' => 'http://foo/bar/baz',
+          'rack.input' => StringIO.new('foo=bar'),
+        }
+
+        returned = ware.call(env)
+
+        returned.should eq([401, {}, []])
+      end
       it "works when I sign it right" do
         env = {
           'HTTP_AUTHORIZATION' => 'foo-bar 123:0d501b6934dc0ec5f1452947a7afd108e41c91af',

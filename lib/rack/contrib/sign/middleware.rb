@@ -33,7 +33,6 @@ module Rack
           env.sort_by { |k,v| k.to_s.downcase }.each do |key,val|
             next unless key =~ /^http_#{@header_prefix}/i
             header = key.sub(/^http_/i, '').gsub(/_/, '-')
-
             receipt.headers[header] = val
           end
 
