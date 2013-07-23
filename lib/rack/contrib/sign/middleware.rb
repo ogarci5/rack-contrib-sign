@@ -1,7 +1,4 @@
 
-require 'logger'
-
-require "rack/contrib/sign/version"
 
 module Rack
   module Contrib
@@ -24,20 +21,23 @@ module Rack
           api_key = '123'
           api_secret = 'abc'
 
-          sign = "#{env['REQUEST_METHOD'].upcase} #{env['REQUEST_URI']}\n"
-          sign << "#{api_key}\n"
-          sign << "#{api_secret}\n"
-          sign << env['rack.input'].read + "\n"
-          sign << "--\n"
+          receipt = Rack::Contrib::Sign::Receipt.new
+          receipt.request_method = env['REQUEST_METHOD']
+          receipt.uri = env['REQUEST_URI']
+          receipt.api_key = api_key
+          receipt.api_secret = api_secret
+          receipt.body = env['rack.input'].read
 
           env['rack.input'].rewind
 
           env.sort_by { |k,v| k.to_s.downcase }.each do |key,val|
-            header = key.downcase
-            next unless header =~ /^http_#{@header_prefix}/
-            header = header.sub(/^http_/, '').gsub(/_/, '-')
-            sign << "#{header}:#{val}\n"
+            next unless key =~ /^http_#{@header_prefix}/i
+            header = key.sub(/^http_/i, '').gsub(/_/, '-')
+
+            receipt.headers[header] = val
           end
+
+          sign = receipt.to_s
 
           digest = OpenSSL::Digest::Digest.new('sha1')
           validation = OpenSSL::HMAC.hexdigest(digest, api_secret, sign)
