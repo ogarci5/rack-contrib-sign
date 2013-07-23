@@ -16,11 +16,13 @@ describe Rack::Contrib::Sign::Middleware do
 
     logger
   end
+  let (:cred_provider) { Hash.new }
   let (:ware) { Rack::Contrib::Sign::Middleware.new(
     app,
     logger: logger,
     realm: "foo-bar",
-    prefix: "HI-"
+    prefix: "HI-",
+    credentials: cred_provider,
   )}
 
   describe "#build_receipt" do
@@ -31,7 +33,7 @@ describe Rack::Contrib::Sign::Middleware do
         'HTTP_HI_FOOO' => 'YIPEE',
         'rack.input' => StringIO.new('foo=bar')
       }
-
+      cred_provider['123'] = 'abc'
       creds = { key: '123', signature: 'foo' }
 
       receipt = ware.build_receipt(env, creds)
@@ -124,6 +126,19 @@ describe Rack::Contrib::Sign::Middleware do
         log_string.string.should eq("INFO - Denied: Authorization header not present or invalid.\n")
       end
 
+      it "abandons ship if the API key is not known" do
+        env = {
+          'HTTP_AUTHORIZATION' => 'foo-bar 123:foo',
+          'REQUEST_METHOD' => '?',
+          'rack.input' => StringIO.new()
+        }
+
+        returned = ware.call(env)
+
+        returned.should eq([401, {}, []])
+        log_string.string.should eq("INFO - Denied: API key not recognized.\n")
+      end
+
       it "401s when I don't sign it right" do
         env = {
           'HTTP_AUTHORIZATION' => 'foo-bar abc:YABBA DABBA DOOO',
@@ -137,6 +152,7 @@ describe Rack::Contrib::Sign::Middleware do
         returned.should eq([401, {}, []])
       end
       it "works when I sign it right" do
+        cred_provider['123'] = 'abc'
         env = {
           'HTTP_AUTHORIZATION' => 'foo-bar 123:0d501b6934dc0ec5f1452947a7afd108e41c91af',
           'REQUEST_METHOD' => 'POST',

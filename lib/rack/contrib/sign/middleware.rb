@@ -8,6 +8,7 @@ module Rack
           @app = app
           @logger = opts[:logger]
           @realm = opts[:realm]
+          @credentials = opts[:credentials]
           @header_prefix = (opts[:prefix] || "").gsub(/-/, '_').downcase
         end
 
@@ -19,6 +20,10 @@ module Rack
           end
 
           receipt = build_receipt env, creds
+          unless receipt.api_secret
+            @logger.info "Denied: API key not recognized."
+            return [401, {}, []]
+          end
 
           sign = receipt.to_s
 
@@ -94,7 +99,9 @@ module Rack
         end
 
         def get_secret api_key
-          return 'abc'
+          return false unless @credentials.has_key? api_key
+
+          return @credentials.fetch(api_key)
         end
       end
     end
