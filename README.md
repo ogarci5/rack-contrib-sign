@@ -1,10 +1,9 @@
 # Rack::Contrib::Sign
 
-TODO: Write a gem description
+Implement thorough request signing in Rack.
 
 ## Installation
 
-Add this line to your application's Gemfile:
 
     gem 'rack-contrib-sign'
 
@@ -18,12 +17,14 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Install in Rack by adding the following to your config.ru:
 
-## Contributing
+```ruby
+require 'rack/contrib/sign
+use Rack::Contrib::Sign::Middleware
+```
 
-1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
+## Specific Authentication Details
+
+This gem works by creating a receipt which gets HMAC hashed with a secret.
+
