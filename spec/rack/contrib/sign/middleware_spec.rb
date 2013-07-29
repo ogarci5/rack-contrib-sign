@@ -164,7 +164,7 @@ describe Rack::Contrib::Sign::Middleware do
           'HTTP_AUTHORIZATION' => 'foo-bar 123:161e2c0484b4dfba72ac5805ea93ad025f453eba',
           'REQUEST_METHOD' => 'POST',
           'HTTP_HOST' => '127.0.0.1:9292',
-          'Content-Type' => 'text/plain',
+          #'Content-Type' => 'text/plain',
           'rack.url_scheme' => 'http',
           'REQUEST_URI' => '/foo/bar/baz',
           'rack.input' => StringIO.new('foo=bar'),
