@@ -29,7 +29,9 @@ describe Rack::Contrib::Sign::Middleware do
     it "sets various options" do
       env = {
         'REQUEST_METHOD' => 'POST',
-        'REQUEST_URI' => 'foo/bar',
+        'HTTP_HOST' => '127.0.0.1:9292',
+        'rack.url_scheme' => 'http',
+        'REQUEST_URI' => '/foo/bar',
         'HTTP_HI_FOOO' => 'YIPEE',
         'rack.input' => StringIO.new('foo=bar')
       }
@@ -38,7 +40,8 @@ describe Rack::Contrib::Sign::Middleware do
 
       receipt = ware.build_receipt(env, creds)
 
-      receipt.uri.should eq('foo/bar')
+      receipt.host.should eq('http://127.0.0.1:9292')
+      receipt.uri.should eq('/foo/bar')
       receipt.request_method.should eq('POST')
       receipt.body.should eq('foo=bar')
       receipt.api_key.should eq('123')
@@ -130,6 +133,8 @@ describe Rack::Contrib::Sign::Middleware do
         env = {
           'HTTP_AUTHORIZATION' => 'foo-bar 123:foo',
           'REQUEST_METHOD' => '?',
+          'HTTP_HOST' => '127.0.0.1:9292',
+          'rack.url_scheme' => 'http',
           'rack.input' => StringIO.new()
         }
 
@@ -143,7 +148,9 @@ describe Rack::Contrib::Sign::Middleware do
         env = {
           'HTTP_AUTHORIZATION' => 'foo-bar abc:YABBA DABBA DOOO',
           'REQUEST_METHOD' => 'POST',
-          'REQUEST_URI' => 'http://foo/bar/baz',
+          'HTTP_HOST' => '127.0.0.1:9292',
+          'rack.url_scheme' => 'http',
+          'REQUEST_URI' => '/foo/bar/baz',
           'rack.input' => StringIO.new('foo=bar'),
         }
 
@@ -154,9 +161,12 @@ describe Rack::Contrib::Sign::Middleware do
       it "works when I sign it right" do
         cred_provider['123'] = 'abc'
         env = {
-          'HTTP_AUTHORIZATION' => 'foo-bar 123:0d501b6934dc0ec5f1452947a7afd108e41c91af',
+          'HTTP_AUTHORIZATION' => 'foo-bar 123:161e2c0484b4dfba72ac5805ea93ad025f453eba',
           'REQUEST_METHOD' => 'POST',
-          'REQUEST_URI' => 'http://foo/bar/baz',
+          'HTTP_HOST' => '127.0.0.1:9292',
+          'Content-Type' => 'text/plain',
+          'rack.url_scheme' => 'http',
+          'REQUEST_URI' => '/foo/bar/baz',
           'rack.input' => StringIO.new('foo=bar'),
           'HTTP_HI_FOOOO' => 'aoenuoneuh',
           'HTTP_BYE_FOOO' => 'oeucorgcgc'

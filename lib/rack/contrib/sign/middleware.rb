@@ -47,6 +47,7 @@ module Rack
         # Extract environmental data into a Receipt
         def build_receipt env, credentials
           receipt = Rack::Contrib::Sign::Receipt.new
+          receipt.host = env['rack.url_scheme'] + '://' + env['HTTP_HOST']
           receipt.uri = env['REQUEST_URI']
           receipt.request_method = env['REQUEST_METHOD']
           receipt.body = extract_body env

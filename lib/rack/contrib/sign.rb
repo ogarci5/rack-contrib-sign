@@ -1,4 +1,5 @@
 
+require 'digest/md5'
 require 'logger'
 
 require "rack/contrib/sign/version"

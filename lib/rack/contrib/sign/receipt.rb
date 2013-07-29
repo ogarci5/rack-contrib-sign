@@ -8,7 +8,9 @@ module Rack
         attr_accessor :api_key
         attr_accessor :api_secret
         attr_accessor :body
+        attr_accessor :content_type
         attr_accessor :uri
+        attr_accessor :host
 
         def initialize
           @headers = {}
@@ -18,17 +20,27 @@ module Rack
           @request_method = s.upcase
         end
 
+        def body_md5
+          Digest::MD5.hexdigest(body)
+        end
+
+        def body_length
+          body.length
+        end
+
         def to_s
           preamble + header_text
         end
 
         def preamble
           s = ""
-          s << "%s %s\n" % [request_method, uri]
+          s << "%s\n" % request_method
+          s << "%s\n" % host
+          s << "%s\n" % uri
           s << "%s\n" % api_key
-          s << "%s\n" % api_secret
-          s << "%s\n" % body
-          s << "--\n"
+          s << "%s\n" % content_type
+          s << "%s\n" % body_length
+          s << "%s\n" % body_md5
           s
         end
 

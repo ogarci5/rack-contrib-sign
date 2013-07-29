@@ -9,8 +9,12 @@ describe Rack::Contrib::Sign::Receipt do
   it { should respond_to(:api_secret=) }
   it { should respond_to(:body) }
   it { should respond_to(:body=) }
+  it { should respond_to(:content_type) }
+  it { should respond_to(:content_type=) }
   it { should respond_to(:request_method) }
   it { should respond_to(:request_method=) }
+  it { should respond_to(:host) }
+  it { should respond_to(:host=) }
   it { should respond_to(:uri) }
   it { should respond_to(:uri=) }
   it { should respond_to(:headers) }
@@ -19,6 +23,22 @@ describe Rack::Contrib::Sign::Receipt do
     it "upcases the method" do
       receipt.request_method = 'post'
       receipt.request_method.should eq('POST')
+    end
+  end
+
+  describe "#body_md5" do
+    it "returns the md5 of the body" do
+      receipt.body = 'herro'
+
+      receipt.body_md5.should eq("18f1072de45420e57fd22ee5bd59df9e")
+    end
+  end
+
+  describe "#body_length" do
+    it "returns the length of the body" do
+      receipt.body = 'herro'
+
+      receipt.body_length.should eq(5)
     end
   end
 
@@ -43,18 +63,22 @@ describe Rack::Contrib::Sign::Receipt do
   describe "#preamble" do
     it "incorporates all the preamble elements in a string block" do
       receipt.api_key = 'abc'
-      receipt.api_secret = '123'
       receipt.body = 'foo=bar'
       receipt.request_method = 'post'
-      receipt.uri = 'http://example.com/123'
+      receipt.host = 'http://example.com'
+      receipt.uri = '/123?foo=bar'
+      receipt.content_type = "text/json"
 
       returned = receipt.preamble
 
-      r = "POST http://example.com/123\n"
+      r = ""
+      r << "POST\n"
+      r << "http://example.com\n"
+      r << "/123?foo=bar\n"
       r << "abc\n"
-      r << "123\n"
-      r << "foo=bar\n"
-      r << "--\n"
+      r << "text/json\n"
+      r << "7\n"
+      r << "06ad47d8e64bd28de537b62ff85357c4\n"
 
       returned.should eq(r)
     end
