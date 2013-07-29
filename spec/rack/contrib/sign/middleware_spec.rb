@@ -31,6 +31,7 @@ describe Rack::Contrib::Sign::Middleware do
         'REQUEST_METHOD' => 'POST',
         'HTTP_HOST' => '127.0.0.1:9292',
         'rack.url_scheme' => 'http',
+        'HTTP_CONTENT_TYPE' => 'text/plain',
         'REQUEST_URI' => '/foo/bar',
         'HTTP_HI_FOOO' => 'YIPEE',
         'rack.input' => StringIO.new('foo=bar')
@@ -41,6 +42,7 @@ describe Rack::Contrib::Sign::Middleware do
       receipt = ware.build_receipt(env, creds)
 
       receipt.host.should eq('http://127.0.0.1:9292')
+      receipt.content_type.should eq('text/plain')
       receipt.uri.should eq('/foo/bar')
       receipt.request_method.should eq('POST')
       receipt.body.should eq('foo=bar')
@@ -161,10 +163,10 @@ describe Rack::Contrib::Sign::Middleware do
       it "works when I sign it right" do
         cred_provider['123'] = 'abc'
         env = {
-          'HTTP_AUTHORIZATION' => 'foo-bar 123:161e2c0484b4dfba72ac5805ea93ad025f453eba',
+          'HTTP_AUTHORIZATION' => 'foo-bar 123:75e8d7d1c4eeb07a049f9f7c1395aa2e61e5a879',
           'REQUEST_METHOD' => 'POST',
           'HTTP_HOST' => '127.0.0.1:9292',
-          #'Content-Type' => 'text/plain',
+          'HTTP_CONTENT_TYPE' => 'text/plain',
           'rack.url_scheme' => 'http',
           'REQUEST_URI' => '/foo/bar/baz',
           'rack.input' => StringIO.new('foo=bar'),
