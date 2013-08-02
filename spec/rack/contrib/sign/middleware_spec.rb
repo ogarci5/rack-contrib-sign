@@ -53,6 +53,26 @@ describe Rack::Contrib::Sign::Middleware do
       })
 
     end
+
+    it "Uses rack:request to handle x-forwarded* headers" do
+      env = {
+        'REQUEST_METHOD' => 'POST',
+        'HTTP_HOST' => '127.0.0.1',
+        'SERVER_PORT' => '9292',
+        'rack.url_scheme' => 'http',
+        'REQUEST_URI' => '/foo/bar',
+        'HTTP_HI_FOOO' => 'YIPEE',
+        'rack.input' => StringIO.new('foo=bar'),
+        'HTTP_X_FORWARDED_PROTO' => 'https',
+        'HTTP_X_FORWARDED_PORT' => '443'
+      }
+      cred_provider['123'] = 'abc'
+      creds = { key: '123', signature: 'foo' }
+
+      receipt = ware.build_receipt(env, creds)
+
+      receipt.host.should eq('https://127.0.0.1')
+    end
   end
 
   describe "#extract_body" do

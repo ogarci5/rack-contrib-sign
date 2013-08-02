@@ -1,4 +1,5 @@
 
+require 'rack'
 require 'digest/md5'
 require 'logger'
 

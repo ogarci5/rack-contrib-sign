@@ -8,7 +8,7 @@ module Rack
           @app = app
           @logger = opts[:logger]
           @realm = opts[:realm]
-          @credentials = opts[:credentials]
+          @credentials = opts[:credentials] || {}
           @header_prefix = (opts[:prefix] || "").gsub(/-/, '_').downcase
         end
 
@@ -46,8 +46,18 @@ module Rack
 
         # Extract environmental data into a Receipt
         def build_receipt env, credentials
+          req = Rack::Request.new(env)
+          pp req
           receipt = Rack::Contrib::Sign::Receipt.new
-          receipt.host = env['rack.url_scheme'] + '://' + env['HTTP_HOST']
+
+          port = ''
+          unless (
+            (req.scheme == 'http' && req.port.to_s == '80') ||
+            (req.scheme == 'https' && req.port.to_s == '443'))
+            port = ':' + req.port.to_s
+          end
+
+          receipt.host = req.scheme + '://' + req.host + port
           receipt.uri = env['REQUEST_URI']
           receipt.request_method = env['REQUEST_METHOD']
           receipt.body = extract_body env
