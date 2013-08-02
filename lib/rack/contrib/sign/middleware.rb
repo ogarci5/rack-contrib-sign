@@ -47,7 +47,6 @@ module Rack
         # Extract environmental data into a Receipt
         def build_receipt env, credentials
           req = Rack::Request.new(env)
-          pp req
           receipt = Rack::Contrib::Sign::Receipt.new
 
           port = ''
