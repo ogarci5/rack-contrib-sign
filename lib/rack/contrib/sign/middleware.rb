@@ -60,7 +60,7 @@ module Rack
           receipt.uri = env['REQUEST_URI']
           receipt.request_method = env['REQUEST_METHOD']
           receipt.body = extract_body env
-          receipt.content_type = env['HTTP_CONTENT_TYPE'] || ''
+          receipt.content_type = env.content_type || ''
 
           extract_headers(env).each { |h,v| receipt.headers[h] = v }
 
