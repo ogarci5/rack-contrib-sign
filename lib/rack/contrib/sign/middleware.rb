@@ -13,6 +13,7 @@ module Rack
         end
 
         def call env
+          @logger.debug env.inspect
           creds = extract_credentials env['HTTP_AUTHORIZATION']
           unless creds
             @logger.info "Denied: Authorization header not present or invalid."
@@ -26,6 +27,7 @@ module Rack
           end
 
           sign = receipt.to_s
+          @logger.debug sign
 
           digest = OpenSSL::Digest::Digest.new('sha1')
           validation = OpenSSL::HMAC.hexdigest(digest, receipt.api_secret, sign)
